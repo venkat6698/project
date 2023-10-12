@@ -95,11 +95,16 @@ function calculatePoints(receipts,receiptId) {
     }
   
     // Rule 6: 6 points if the day in the purchase date is odd
-    const purchaseDate = new Date(receipt.purchaseDate);
-    if (purchaseDate.getDate()%2 !=0) {
-        totalPoints += 6;
+    const purchaseDate = receipt.purchaseDate.split('-');
+    const year = parseInt(purchaseDate[0]);
+    const month = parseInt(purchaseDate[1]) - 1; // Month is zero-based
+    const day = parseInt(purchaseDate[2]);
+
+    const purchase = new Date(Date.UTC(year, month, day));
+
+    if (purchase.getUTCDate() % 2 !== 0) {
+      totalPoints += 6;
     }
-  
     // Rule 7: 10 points if the time of purchase is after 2:00pm and before 4:00pm
     const purchaseTime = receipt.purchaseTime.split(':');
     const hour = parseInt(purchaseTime[0]);
