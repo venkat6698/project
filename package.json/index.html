@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POST and GET Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            }
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+        }
+        main {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #333;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>POST and GET Request Example</h1>
+    </header>
+    <main>
+        <h2>Send a POST Request</h2>
+        <label for="post-data">Data to Send:</label>
+        <input type="text" id="post-data" placeholder="Enter data to send">
+        <button onclick="sendPostRequest()">Submit POST Request</button>
+
+        <h2>Received Data (GET Request)</h2>
+        <button onclick="sendGetRequest()">Send GET Request</button>
+        <pre id="get-response"></pre>
+    </main>
+
+    <script>
+        var id;
+        const fs = require('fs');
+        function sendPostRequest() {
+        try {
+            //const jsonString = fs.readFileSync('input.json', 'utf8');
+            const postData = document.getElementById('post-data').value;
+            const jsonObject = JSON.parse(postData);
+            console.log(jsonObject);
+            fetch('http://localhost:3000/receipts/process', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonObject)
+            })
+            .then(response => response.json())
+            .then(response => {
+                // Display the POST response on the page
+                id = response.id;
+                const getResponse = document.getElementById('get-response');
+                getResponse.innerText = JSON.stringify(response, null, 2);
+            })
+        }catch (error) {
+            console.error("Invalid JSON input:", error.message);
+        }
+        }
+        function sendGetRequest() {
+           // Example GET request using fetch
+           if (id) {
+                fetch('http://localhost:3000/receipts/' + id + '/points')
+                .then(response => response.json())
+                .then(data => {
+                    // Display the GET response on the page
+                    const getResponse = document.getElementById('get-response');
+                    getResponse.innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('GET request error:', error);
+                });
+            } else {
+                console.error("ID is missing or null. Please send a POST request first.");
+            }
+        }
+    </script>
+</body>
+</html>
